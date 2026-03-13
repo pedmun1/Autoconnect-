@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoConnect AI | Directorio Comercial</title>
+    <title>AutoConnect AI | Multi-Garaje</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');
@@ -17,81 +17,68 @@
     <header class="bg-white border-b border-slate-200 p-4 sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-xl font-black text-blue-600 italic tracking-tighter">AUTOCONNECT <span class="text-slate-900">AI</span></h1>
-            <div id="status" class="text-[9px] font-bold bg-green-100 text-green-700 px-2 py-1 rounded-full uppercase">Sistema Activo</div>
+            <button onclick="mostrarFormularioNuevo()" class="bg-blue-600 text-white text-[10px] font-bold px-3 py-2 rounded-full uppercase shadow-lg">+ Añadir Auto</button>
         </div>
     </header>
 
     <nav class="bg-white border-b border-slate-200 flex justify-around sticky top-[61px] z-40 shadow-sm">
-        <button onclick="cambiarTab('mi-auto')" id="btn-mi-auto" class="flex-1 py-4 text-xs font-bold uppercase tracking-widest tab-active">Mi Auto</button>
+        <button onclick="cambiarTab('garaje')" id="btn-garaje" class="flex-1 py-4 text-xs font-bold uppercase tracking-widest tab-active">Mi Garaje</button>
         <button onclick="cambiarTab('directorio')" id="btn-directorio" class="flex-1 py-4 text-xs font-bold uppercase tracking-widest text-slate-400">Directorio</button>
     </nav>
 
     <main class="container mx-auto p-4 max-w-lg">
         
-        <div id="view-mi-auto" class="space-y-6">
-            <div id="dashboard" class="hidden mt-4 space-y-6">
-                <div class="bg-white rounded-[2.5rem] p-8 shadow-xl border border-slate-100">
-                    <h2 id="carName" class="text-2xl font-black text-slate-800 leading-tight mb-6">---</h2>
-                    <div class="bg-slate-900 rounded-3xl p-6 text-white flex justify-between items-center">
-                        <div>
-                            <p class="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Millaje Estimado</p>
-                            <p id="displayMileage" class="text-4xl font-black leading-none italic">0</p>
-                        </div>
-                        <button onclick="editarMillaje()" class="bg-blue-600 p-3 rounded-2xl hover:bg-blue-500 shadow-lg transition-all">
-                            <span class="text-xs font-bold">Ajustar</span>
-                        </button>
-                    </div>
+        <div id="view-garaje" class="space-y-6">
+            <div id="lista-autos" class="space-y-4 mt-4">
                 </div>
-                <div id="liveAlerts" class="space-y-4"></div>
-            </div>
-
-            <div id="onboarding" class="bg-white rounded-[2.5rem] p-8 shadow-xl mt-10 text-center">
-                <div class="text-5xl mb-4">🛸</div>
-                <h2 class="text-2xl font-black text-slate-800">Cero manuales.</h2>
-                <p class="text-slate-500 text-sm mb-8">Conecta tu VIN y deja que nuestra IA prediga tus mantenimientos.</p>
-                <input type="text" id="vinInput" placeholder="VIN (17 DÍGITOS)" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl mb-3 text-center font-mono uppercase">
-                <input type="number" id="mileageInput" placeholder="Millaje Actual" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl mb-4 text-center font-bold">
-                <button onclick="activarAI()" class="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-xl hover:bg-blue-700 transition-all uppercase tracking-widest text-xs">Vincular Vehículo</button>
-            </div>
         </div>
 
         <div id="view-directorio" class="hidden mt-4 space-y-4">
-            <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-[2rem] p-6 text-white shadow-lg relative overflow-hidden">
-                <div class="relative z-10">
-                    <h3 class="text-lg font-black uppercase italic tracking-tighter">¿Eres mecánico o dueño de tienda?</h3>
-                    <p class="text-[11px] opacity-90 mb-4">Recibe clientes referidos de nuestra plataforma todos los días.</p>
-                    <button onclick="registrarNegocio()" class="bg-orange-500 hover:bg-orange-400 text-white font-black py-3 px-6 rounded-xl text-[10px] uppercase shadow-lg transition-all">
-                        Registrar mi Negocio ✅
-                    </button>
-                </div>
-                <div class="absolute right-[-10px] bottom-[-10px] text-7xl opacity-20 italic font-black">PRO</div>
+            <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-[2rem] p-6 text-white shadow-lg">
+                <h3 class="text-lg font-black uppercase italic tracking-tighter">¿Eres profesional?</h3>
+                <p class="text-[11px] opacity-90 mb-4">Aparece como "Verificado" y recibe más clientes.</p>
+                <button onclick="registrarNegocio()" class="bg-orange-500 text-white font-black py-3 px-6 rounded-xl text-[10px] uppercase shadow-lg">Registrar mi Negocio</button>
             </div>
+            <div id="providerList" class="space-y-4 pt-4"></div>
+        </div>
 
-            <div id="providerList" class="space-y-4 pt-4">
+        <div id="modal-auto" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+            <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-md shadow-2xl">
+                <h2 class="text-2xl font-black text-slate-800 mb-2">Nuevo Vehículo</h2>
+                <p class="text-slate-500 text-xs mb-6 text-balance">Registra otro auto para activar el seguimiento por IA.</p>
+                <input type="text" id="vinInput" placeholder="VIN (17 DÍGITOS)" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl mb-3 font-mono uppercase text-sm">
+                <input type="number" id="mileageInput" placeholder="Millaje Actual" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl mb-4 font-bold">
+                <div class="flex gap-2">
+                    <button onclick="cerrarFormulario()" class="flex-1 bg-slate-200 text-slate-600 font-bold py-4 rounded-2xl uppercase text-[10px]">Cancelar</button>
+                    <button onclick="activarAI()" class="flex-[2] bg-blue-600 text-white font-black py-4 rounded-2xl shadow-xl uppercase text-[10px] tracking-widest">Vincular</button>
                 </div>
+            </div>
         </div>
     </main>
 
     <script>
-        let appData = JSON.parse(localStorage.getItem('auto_ai_pro')) || null;
+        // --- CONFIGURACIÓN ---
+        const WHATSAPP_ADMIN = "17873820391"; // Reemplaza con tu número real
+        let misAutos = JSON.parse(localStorage.getItem('garaje_autoconnect')) || [];
         
-        // REEMPLAZA ESTO CON TU NÚMERO PARA RECIBIR REGISTROS DE NEGOCIOS
-        const WHATSAPP_ADMIN = "17873820391"; 
-
         const proveedores = [
-            { nombre: "Taller Los Amigos", tipo: "Mecánica General", zona: "San Juan", rating: "5.0", wa: "17873820391", icono: "🔧" },
-            { nombre: "Euro Parts", tipo: "Tienda de Piezas", zona: "Bayamón", rating: "4.8", wa: "17873820391", icono: "📦" }
+            { nombre: "Master Mechanic", tipo: "Taller Premium", zona: "Area Metro", rating: "5.0", wa: "17873820391", icono: "👨‍🔧", verificado: true },
+            { nombre: "Parts Online", tipo: "Repuestos", zona: "Todo el país", rating: "4.7", wa: "17873820391", icono: "📦", verificado: false }
         ];
 
-        if(appData) iniciarApp();
+        // --- FUNCIONES CORE ---
+        window.onload = () => { renderGaraje(); };
 
         function cambiarTab(tab) {
-            document.getElementById('view-mi-auto').classList.toggle('hidden', tab !== 'mi-auto');
+            document.getElementById('view-garaje').classList.toggle('hidden', tab !== 'garaje');
             document.getElementById('view-directorio').classList.toggle('hidden', tab !== 'directorio');
-            document.getElementById('btn-mi-auto').classList.toggle('tab-active', tab === 'mi-auto');
+            document.getElementById('btn-garaje').classList.toggle('tab-active', tab === 'garaje');
             document.getElementById('btn-directorio').classList.toggle('tab-active', tab === 'directorio');
             if(tab === 'directorio') renderDirectorio();
         }
+
+        function mostrarFormularioNuevo() { document.getElementById('modal-auto').classList.remove('hidden'); }
+        function cerrarFormulario() { document.getElementById('modal-auto').classList.add('hidden'); }
 
         async function activarAI() {
             const vin = document.getElementById('vinInput').value.trim();
@@ -103,7 +90,8 @@
                 const data = await res.json();
                 const getVal = (v) => data.Results.find(r => r.Variable === v)?.Value || "Auto";
 
-                appData = {
+                const nuevoAuto = {
+                    id: Date.now(),
                     carName: `${getVal("Model Year")} ${getVal("Make")} ${getVal("Model")}`,
                     vin: vin.toUpperCase(),
                     startMiles: miles,
@@ -111,50 +99,51 @@
                     dailyUsage: 45,
                     lastDone: {}
                 };
-                localStorage.setItem('auto_ai_pro', JSON.stringify(appData));
-                iniciarApp();
-            } catch (e) { alert("Error de conexión"); }
+
+                misAutos.push(nuevoAuto);
+                localStorage.setItem('garaje_autoconnect', JSON.stringify(misAutos));
+                cerrarFormulario();
+                renderGaraje();
+            } catch (e) { alert("Error de conexión con NHTSA"); }
         }
 
-        function iniciarApp() {
-            document.getElementById('onboarding').classList.add('hidden');
-            document.getElementById('dashboard').classList.remove('hidden');
-            actualizarSistema();
-            setInterval(actualizarSistema, 60000);
-        }
+        function renderGaraje() {
+            const container = document.getElementById('lista-autos');
+            if(misAutos.length === 0) {
+                container.innerHTML = `<div class="text-center py-20 text-slate-400 text-sm">No tienes autos registrados.<br>Toca "+ Añadir Auto" para empezar.</div>`;
+                return;
+            }
 
-        function actualizarSistema() {
-            if(!appData) return;
-            const dias = (new Date().getTime() - appData.startDate) / (1000 * 60 * 60 * 24);
-            const currentMiles = Math.floor(appData.startMiles + (dias * appData.dailyUsage));
-            document.getElementById('carName').innerText = appData.carName;
-            document.getElementById('displayMileage').innerText = currentMiles.toLocaleString();
-            renderAlertas(currentMiles);
-        }
+            container.innerHTML = misAutos.map(auto => {
+                const dias = (new Date().getTime() - auto.startDate) / (1000 * 60 * 60 * 24);
+                const currentMiles = Math.floor(auto.startMiles + (dias * auto.dailyUsage));
+                
+                // Cálculo de alertas (aceite como ejemplo)
+                const ultimoAceite = auto.lastDone["Aceite"] || 0;
+                const faltanAceite = 5000 - (currentMiles - ultimoAceite);
 
-        function renderAlertas(currentMiles) {
-            const plan = [
-                { s: "Cambio de Aceite", i: 5000, icon: "🛢️" },
-                { s: "Rotación de Gomas", i: 8000, icon: "🛞" },
-                { s: "Inspección de Frenos", i: 20000, icon: "🛑" }
-            ];
-            const container = document.getElementById('liveAlerts');
-            container.innerHTML = plan.map(item => {
-                const ultimo = appData.lastDone[item.s] || 0;
-                const faltan = item.i - (currentMiles - ultimo);
-                const isUrgent = faltan <= 500;
                 return `
-                    <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex justify-between items-center transition-all hover:shadow-md">
-                        <div class="flex items-center gap-4">
-                            <span class="text-3xl">${item.icon}</span>
+                    <div class="bg-white rounded-[2rem] p-6 shadow-lg border border-slate-100">
+                        <div class="flex justify-between items-start mb-4">
                             <div>
-                                <p class="font-black text-slate-800 text-sm uppercase italic tracking-tighter">${item.s}</p>
-                                <p class="text-[10px] font-bold ${isUrgent ? 'text-red-500' : 'text-slate-400'} uppercase">
-                                    ${faltan <= 0 ? 'Vencido' : 'Faltan ' + Math.floor(faltan).toLocaleString() + ' mi'}
-                                </p>
+                                <h3 class="font-black text-lg text-slate-800 leading-tight">${auto.carName}</h3>
+                                <p class="text-[9px] font-mono text-slate-400 uppercase tracking-tighter">VIN: ${auto.vin}</p>
                             </div>
+                            <button onclick="eliminarAuto(${auto.id})" class="text-red-400 text-xs font-bold">Eliminar</button>
                         </div>
-                        <button onclick="completarServicio('${item.s}', ${currentMiles})" class="text-[9px] bg-green-500 text-white font-black px-4 py-2 rounded-xl uppercase">OK</button>
+                        
+                        <div class="bg-slate-900 rounded-2xl p-4 text-white flex justify-between items-center mb-4">
+                            <div>
+                                <p class="text-[8px] font-bold text-blue-400 uppercase">Millaje IA</p>
+                                <p class="text-2xl font-black italic">${currentMiles.toLocaleString()}</p>
+                            </div>
+                            <button onclick="editarMillaje(${auto.id})" class="bg-blue-600 p-2 rounded-lg text-[9px] font-bold">✏️ EDITAR</button>
+                        </div>
+
+                        <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 flex justify-between items-center">
+                            <span class="text-[10px] font-bold text-blue-800 uppercase italic">Próximo Aceite:</span>
+                            <span class="text-[10px] font-black ${faltanAceite < 500 ? 'text-red-600' : 'text-blue-600'}">${Math.max(0, Math.floor(faltanAceite)).toLocaleString()} mi</span>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -163,49 +152,54 @@
         function renderDirectorio() {
             const container = document.getElementById('providerList');
             container.innerHTML = proveedores.map(p => `
-                <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                <div class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm">
                     <div class="flex justify-between items-start mb-4">
                         <div class="flex items-center gap-3">
                             <span class="text-3xl">${p.icono}</span>
                             <div>
-                                <p class="font-black text-slate-800 text-sm uppercase">${p.nombre}</p>
+                                <p class="font-black text-slate-800 text-sm uppercase flex items-center gap-1">
+                                    ${p.nombre} 
+                                    ${p.verificado ? '<span class="text-blue-500 text-[12px]" title="Verificado">✅</span>' : ''}
+                                </p>
                                 <p class="text-[10px] text-blue-600 font-bold uppercase">${p.tipo}</p>
                             </div>
                         </div>
+                        <span class="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-1 rounded-lg font-bold">⭐ ${p.rating}</span>
                     </div>
-                    <div class="flex justify-between items-center border-t pt-4 border-slate-50 text-[10px]">
-                        <span class="text-slate-400 font-bold uppercase tracking-widest">📍 ${p.zona}</span>
-                        <a href="https://wa.me/${p.wa}?text=${encodeURIComponent('Hola, los vi en AutoConnect. Busco servicio para mi ' + (appData?.carName || 'auto'))}" 
-                           target="_blank" class="bg-slate-900 text-white px-5 py-2 rounded-xl font-bold uppercase">Contactar</a>
+                    <div class="flex justify-between items-center border-t pt-4 border-slate-50">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase">📍 ${p.zona}</span>
+                        <a href="https://wa.me/${p.wa}?text=Hola, los vi en AutoConnect. Busco servicio profesional." 
+                           target="_blank" class="bg-slate-900 text-white px-5 py-2 rounded-xl font-bold uppercase text-[9px] tracking-widest">Contactar</a>
                     </div>
                 </div>
             `).join('');
         }
 
+        function editarMillaje(id) {
+            const n = prompt("Nuevo millaje real:");
+            if(!n) return;
+            misAutos = misAutos.map(a => {
+                if(a.id === id) {
+                    a.startMiles = parseInt(n);
+                    a.startDate = new Date().getTime();
+                }
+                return a;
+            });
+            localStorage.setItem('garaje_autoconnect', JSON.stringify(misAutos));
+            renderGaraje();
+        }
+
+        function eliminarAuto(id) {
+            if(confirm("¿Seguro que quieres borrar este vehículo de tu garaje?")) {
+                misAutos = misAutos.filter(a => a.id !== id);
+                localStorage.setItem('garaje_autoconnect', JSON.stringify(misAutos));
+                renderGaraje();
+            }
+        }
+
         function registrarNegocio() {
-            const mensaje = `Hola! 👋 Quiero registrar mi negocio en el Directorio de *AutoConnect AI*.\n\n🏛️ *Nombre del Negocio:*\n🔧 *Especialidad:*\n📍 *Zona:*\n📞 *Teléfono de contacto:*`;
-            window.open(`https://wa.me/${WHATSAPP_ADMIN}?text=${encodeURIComponent(mensaje)}`, '_blank');
+            window.open(`https://wa.me/${WHATSAPP_ADMIN}?text=Quiero registrar mi negocio como VIP en AutoConnect AI`, '_blank');
         }
-
-        function completarServicio(nombre, millas) {
-            if(confirm(`¿Registrar ${nombre} realizado?`)) {
-                appData.lastDone[nombre] = millas;
-                localStorage.setItem('auto_ai_pro', JSON.stringify(appData));
-                actualizarSistema();
-            }
-        }
-
-        function editarMillaje() {
-            const n = prompt("Ingresa millaje real:");
-            if(n) { 
-                appData.startMiles = parseInt(n); 
-                appData.startDate = new Date().getTime(); 
-                localStorage.setItem('auto_ai_pro', JSON.stringify(appData)); 
-                actualizarSistema(); 
-            }
-        }
-
-        function resetearApp() { if(confirm("¿Borrar auto?")) { localStorage.removeItem('auto_ai_pro'); location.reload(); } }
     </script>
 </body>
 </html>

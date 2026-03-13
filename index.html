@@ -59,11 +59,6 @@
                     <h3 class="font-black text-sm uppercase italic">Vende tus piezas gratis</h3>
                     <button onclick="mostrarFormMarket()" class="bg-white text-green-600 font-black py-2 px-6 rounded-xl text-[9px] uppercase mt-2">Publicar Artículo</button>
                 </div>
-                <div class="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
-                    <button onclick="filtrarMarket('Todas')" class="border px-4 py-2 rounded-full text-[10px] font-bold uppercase bg-blue-600 text-white">Todas</button>
-                    <button onclick="filtrarMarket('Gomas')" class="bg-white border px-4 py-2 rounded-full text-[10px] font-bold uppercase">Gomas</button>
-                    <button onclick="filtrarMarket('Motor')" class="bg-white border px-4 py-2 rounded-full text-[10px] font-bold uppercase">Motor</button>
-                </div>
                 <div id="marketList" class="grid grid-cols-2 gap-3 pt-2"></div>
             </div>
 
@@ -103,7 +98,6 @@
     </div>
 
     <script>
-        // --- BASE DE DATOS Y ESTADO ---
         let misAutos = JSON.parse(localStorage.getItem('garaje_autoconnect')) || [];
         let marketItems = JSON.parse(localStorage.getItem('market_autoconnect')) || [
             { id: 1, categoria: "Gomas", nombre: "Aros 17 Mazda 3", precio: "450", wa: "17873820391" },
@@ -114,7 +108,6 @@
             { nombre: "Quick Mechanic PR", zona: "Bayamón", d: 5.4, reg: 39.0, sin: 75.0, wa: "17873820391", h: {i:9, f:16}, v: true }
         ];
 
-        // --- CORE: AUTH & TABS ---
         function handleAuth() {
             const name = document.getElementById('reg-name').value;
             const email = document.getElementById('reg-email').value;
@@ -144,10 +137,6 @@
             if(tab === 'directorio') renderDirectorio();
         }
 
-        // --- GARAJE & IA ---
-        function mostrarFormAuto() { document.getElementById('modal-auto').classList.remove('hidden'); }
-        function cerrarModal(id) { document.getElementById(id).classList.add('hidden'); }
-
         async function activarAI() {
             const vin = document.getElementById('vinInput').value.trim();
             const miles = parseInt(document.getElementById('mileageInput').value);
@@ -173,7 +162,6 @@
         function renderGaraje() {
             const container = document.getElementById('lista-autos');
             if(misAutos.length === 0) return container.innerHTML = `<p class="text-center py-20 text-slate-400 text-sm">No hay autos. Registra uno arriba.</p>`;
-            
             container.innerHTML = misAutos.map(auto => `
                 <div class="bg-white rounded-[2.5rem] p-6 shadow-lg border border-slate-100">
                     <h3 class="font-black text-lg text-slate-800">${auto.name}</h3>
@@ -183,7 +171,6 @@
                         <span class="bg-blue-600 text-[8px] px-2 py-1 rounded-full font-bold">ACTIVO</span>
                     </div>
                     <div class="space-y-2">
-                        <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest">Diagnóstico:</p>
                         ${auto.recs.map(r => `
                             <div class="flex justify-between items-center p-3 rounded-xl ${r.urg ? 'bg-red-50' : 'bg-slate-50'} border">
                                 <span class="text-[10px] font-black uppercase">${r.t}</span>
@@ -195,11 +182,9 @@
             `).join('');
         }
 
-        // --- MARKETPLACE ---
-        function renderMarket(cat = 'Todas') {
+        function renderMarket() {
             const container = document.getElementById('marketList');
-            const filtrados = cat === 'Todas' ? marketItems : marketItems.filter(i => i.categoria === cat);
-            container.innerHTML = filtrados.map(i => `
+            container.innerHTML = marketItems.map(i => `
                 <div class="bg-white p-4 rounded-3xl border shadow-sm flex flex-col justify-between">
                     <div>
                         <div class="h-20 bg-slate-50 rounded-xl mb-2 flex items-center justify-center text-2xl">⚙️</div>
@@ -211,16 +196,12 @@
             `).join('');
         }
 
-        // --- DIRECTORIO & CALENDARIO ---
-        let tallerActual = null;
-
         function renderDirectorio() {
             const container = document.getElementById('providerList');
             container.innerHTML = talleres.map(t => `
                 <div class="bg-white p-6 rounded-[2.5rem] border shadow-md">
                     <div class="flex justify-between mb-4">
                         <div><h4 class="font-black text-sm uppercase">${t.nombre} ${t.v ? '✅' : ''}</h4><p class="text-[9px] text-slate-400">📍 ${t.zona}</p></div>
-                        <span class="bg-orange-100 text-orange-600 text-[8px] font-bold px-2 py-1 rounded-lg">CUPÓN DISPONIBLE</span>
                     </div>
                     <div class="grid grid-cols-2 gap-2 mb-4">
                         <div class="bg-slate-50 p-2 rounded-xl text-center"><p class="text-[7px] font-bold uppercase">Regular</p><p class="font-black text-sm">$${t.reg}</p></div>
@@ -249,13 +230,13 @@
             const f = document.getElementById('cita-fecha').value;
             const h = document.getElementById('cita-hora').value;
             if(!f || h.includes('Hora')) return alert("Elige día y hora");
-            
             const msg = `*CITA CONFIRMADA CON DEPÓSITO*%0A*Taller:* ${tallerActual.nombre}%0A*Fecha:* ${f}%0A*Hora:* ${h}%0A_Cita reservada vía AutoConnect AI_`;
             window.open(`https://wa.me/${tallerActual.wa}?text=${msg}`, '_blank');
             cerrarModal('modal-cita');
-            alert("¡Depósito simulado exitoso! Redirigiendo a WhatsApp...");
         }
 
+        function mostrarFormAuto() { document.getElementById('modal-auto').classList.remove('hidden'); }
+        function cerrarModal(id) { document.getElementById(id).classList.add('hidden'); }
         window.onload = checkSession;
     </script>
 </body>

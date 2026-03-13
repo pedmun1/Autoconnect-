@@ -136,28 +136,79 @@
             if(tab === 'market') renderMarket();
             if(tab === 'directorio') renderDirectorio();
         }
+async function activarAI() {
+    const vinInput = document.getElementById('vinInput');
+    const vin = vinInput.value.trim().toUpperCase();
+    const miles = parseInt(document.getElementById('mileageInput').value);
 
-        async function activarAI() {
-            const vin = document.getElementById('vinInput').value.trim();
-            const miles = parseInt(document.getElementById('mileageInput').value);
-            if(!vin || isNaN(miles)) return alert("Completa los datos");
+    if (vin.length < 11 || isNaN(miles)) {
+        alert("Por favor, ingresa un VIN válido y el millaje.");
+        return;
+    }
 
-            try {
-                const res = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/${vin}?format=json`);
-                const data = await res.json();
-                const getVal = (v) => data.Results.find(r => r.Variable === v)?.Value || "Vehículo";
-                
-                const recs = [];
-                if(miles > 3000) recs.push({t:"Cambio de Aceite", urg: miles > 5000});
-                if(miles > 30000) recs.push({t:"Frenos & Gomas", urg: false});
-                if(miles > 90000) recs.push({t:"Correa de Tiempo", urg: true});
+    // Cambiar texto del botón para que el usuario sepa que está cargando
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "Consultando IA...";
+    btn.disabled = true;
 
-                misAutos.push({ id: Date.now(), name: `${getVal("Model Year")} ${getVal("Make")} ${getVal("Model")}`, vin, miles, recs });
-                localStorage.setItem('garaje_autoconnect', JSON.stringify(misAutos));
-                cerrarModal('modal-auto');
-                renderGaraje();
-            } catch(e) { alert("Error VIN"); }
+    try {
+        // Consultar la API oficial
+        const response = await fetch(`https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVin/${vin}?format=json`);
+        
+        if (!response.ok) throw new Error("Error de conexión");
+        
+        const data = await response.json();
+        
+        // Extraer marca, modelo y año
+        const getVal = (v) => {
+            const res = data.Results.find(r => r.Variable === v);
+            return (res && res.Value && res.Value !== "null") ? res.Value : "";
+        };
+
+        let marca = getVal("Make");
+        let modelo = getVal("Model");
+        let anio = getVal("Model Year");
+
+        // "Plan B" si la API no devuelve nombre (VIN no encontrado o error)
+        if (!marca) {
+            marca = "Vehículo";
+            modelo = "Identificado";
+            anio = "N/A";
         }
+
+        // Lógica de Recomendaciones basada en millaje
+        const recs = [];
+        if (miles >= 3000) recs.push({ t: "Cambio de Aceite & Filtro", urg: miles > 5000 });
+        if (miles >= 15000) recs.push({ t: "Filtro de Aire y Cabina", urg: false });
+        if (miles >= 30000) recs.push({ t: "Revisión de Frenos", urg: miles > 45000 });
+        if (miles >= 60000) recs.push({ t: "Bujías y Correas Acc.", urg: false });
+        if (miles >= 90000) recs.push({ t: "Bomba de Agua / Timing Belt", urg: true });
+
+        // Guardar auto
+        const nuevoAuto = {
+            id: Date.now(),
+            name: `${anio} ${marca} ${modelo}`,
+            vin: vin,
+            miles: miles,
+            recs: recs
+        };
+
+        misAutos.push(nuevoAuto);
+        localStorage.setItem('garaje_autoconnect', JSON.stringify(misAutos));
+        
+        cerrarModal('modal-auto');
+        renderGaraje();
+        alert(`¡${marca} ${modelo} vinculado con éxito!`);
+
+    } catch (error) {
+        console.error("Error VIN:", error);
+        alert("Hubo un problema conectando con la base de datos de VIN. Inténtalo de nuevo en unos segundos.");
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
 
         function renderGaraje() {
             const container = document.getElementById('lista-autos');
